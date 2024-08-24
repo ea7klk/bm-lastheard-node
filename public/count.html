@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Record Count</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Number of Records in the Table</h1>
+  <p id="record-count">Loading...</p>
+
+  <script>
+    async function fetchRecordCount() {
+      try {
+        const response = await fetch('/record-count');
+        const data = await response.json();
+        document.getElementById('record-count').textContent = data.count;
+      } catch (error) {
+        console.error('Error fetching record count:', error);
+        document.getElementById('record-count').textContent = 'Error loading data';
+      }
+    }
+
+    // Fetch record count on page load
+    fetchRecordCount();
+
+    // Refresh the page every 5 seconds
+    setInterval(fetchRecordCount, 5000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Last Heard Records</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Last Heard Records</h1>
+  <table>
+    <thead>
+      <tr id="table-headers">
+        <!-- Headers will be inserted here -->
+      </tr>
+    </thead>
+    <tbody id="records">
+      <!-- Records will be inserted here -->
+    </tbody>
+  </table>
+
+  <script>
+    async function fetchRecords() {
+      try {
+        const response = await fetch('/lastheard');
+        const records = await response.json();
+        const recordsTable = document.getElementById('records');
+        const headersRow = document.getElementById('table-headers');
+
+        // Clear existing content
+        recordsTable.innerHTML = '';
+        headersRow.innerHTML = '';
+
+        if (records.length > 0) {
+          // Create table headers
+          const headers = Object.keys(records[0]);
+          headers.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headersRow.appendChild(th);
+          });
+
+          // Create table rows
+          records.forEach(record => {
+            const row = document.createElement('tr');
+            headers.forEach(header => {
+              const td = document.createElement('td');
+              td.textContent = record[header];
+              row.appendChild(td);
+            });
+            recordsTable.appendChild(row);
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching records:', error);
+      }
+    }
+
+    // Fetch records every 5 seconds
+    setInterval(fetchRecords, 5000);
+
+    // Initial fetch
+    fetchRecords();
+  </script>
+</body>
+</html>
