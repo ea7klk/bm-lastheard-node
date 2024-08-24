@@ -24,6 +24,12 @@ Copilot was spot on for most of the things, the only issues I had to change manu
 - run ```npm install``` to install the dependencies.
 - run  ```node lh.js``` to start the program.  
 
+OR
+
+- docker run -p 3000:3000 ghcr.io/ea7klk/bm-lastheard-node:latest
+
+Right now there is no way (yet) to persist the database outside of the container. To be added soon. 
+
 The database will be created automatically if it's not present. 
 
 ## Contribute
