@@ -20,5 +20,10 @@ run  ```node lh.js``` to start the program.
 
 ### Clone the repository
 ```bash
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo
+git clone https://github.com/ea7klk/bm-lastheard-node.git
+cd bm-lastheard-node
+
+### Contribute
+- Fork the repository
+- Create your own branch
+- When done, create a pull request. 
