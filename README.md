@@ -3,10 +3,13 @@
 ## Description
 This is a NodeJS program, developed almost completely with GitHub Copilot that could be useful for radio amateurs using the Brandmeister DMR network. 
 
-It connect to the BM Lastheard websocket.  
+Copilot was spot on for most of the things, the only issues I had to change manually were some confusions about treating JSON objects as strings and the portions to filter out some data. 
+
+It connects to the BM Lastheard websocket (socket.io).  
 It gets all the data, ignores non-group calls and calls shorter than 5 seconds.  
+It calculates the duration of the call
 It inserts this data into an SQLITE database.  
-I am also providing some simple web pages to display some of the data
+I'm also providing some simple web pages to display some of the data
 
 ## Prerequisites
 - Docker
