@@ -125,6 +125,11 @@ socket.on('mqtt', (data) => {
     return;
   }
 
+  // Skip if lastheard.DestinationID is 9 (Local)
+  if ((lastheard.DestinationID == 9)) {
+    return;
+  }
+
   // Step 9: Output the keys and values in the format Key......value
   for (const key in lastheard) {
     if (lastheard.hasOwnProperty(key)) {
