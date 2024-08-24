@@ -3,6 +3,8 @@
 ## Description
 This is a NodeJS program, developed almost completely with GitHub Copilot that could be useful for radio amateurs using the Brandmeister DMR network. 
 
+The main purpose of this is to teach myself some NodeJS, and maybe provide a useful basis for someone to process the data from Brandmeister Lastheard. 
+
 Copilot was spot on for most of the things, the only issues I had to change manually were some confusions about treating JSON objects as strings and the portions to filter out some data. 
 
 - It connects to the BM Lastheard websocket (socket.io).  
