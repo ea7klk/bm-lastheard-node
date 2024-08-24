@@ -6,7 +6,7 @@ This is a NodeJS program, developed almost completely with GitHub Copilot that c
 It connect to the BM Lastheard websocket.  
 It gets all the data, ignores non-group calls and calls shorter than 5 seconds.  
 It inserts this data into an SQLITE database.  
-I am also providing some simple web pages rto display some of the data
+I am also providing some simple web pages to display some of the data
 
 ## Prerequisites
 - Docker
