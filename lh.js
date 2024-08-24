@@ -126,7 +126,7 @@ socket.on('mqtt', (data) => {
   }
 
   // Skip if lastheard.DestinationID is 9 (Local)
-  if ((lastheard.DestinationID == 9)) {
+  if ((lastheard.DestinationID === 9)) {
     return;
   }
 
