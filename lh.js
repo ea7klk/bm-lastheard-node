@@ -4,65 +4,15 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const routes = require('./routes'); // Import the routes
+const routes = require('./routes.js'); // Import the routes
 
 // Serve static files from the "public" directory
 app.use(express.static('public'));
 
-// Route to get the last 20 records from the database
-app.get('/lastheard', (req, res) => {
-  db.all('SELECT * FROM lastheard ORDER BY Timestamp DESC LIMIT 20', (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(rows);
-  });
-});
+// use the routes defined in routes.js
+app.use('/', routes);
 
-// Route to get the 20 most frequent DestinationName
-app.get('/top-destinations', (req, res) => {
-    db.all(`
-      SELECT DestinationName, DestinationID, COUNT(*) AS count 
-      FROM lastheard 
-      GROUP BY DestinationName 
-      ORDER BY count DESC 
-      LIMIT 20
-    `, (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(rows);
-    });
-  });
-  
 
-// Route to get the count of records in the database
-app.get('/record-count', (req, res) => {
-  db.get('SELECT COUNT(*) AS count FROM lastheard', (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ count: row.count });
-  });
-});
-
-// Route to get the 20 most frequent SourceCall
-app.get('/top-sourcecalls', (req, res) => {
-    db.all(`
-      SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
-      FROM lastheard 
-      WHERE SourceCall != ''
-      GROUP BY SourceCall, TalkerAlias 
-      ORDER BY count DESC 
-      LIMIT 20
-    `, (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(rows);
-    });
-  });
-  
 // Start the server
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on http://0.0.0.0:${port}`);
