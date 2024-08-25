@@ -26,9 +26,13 @@ Copilot was spot on for most of the things, the only issues I had to change manu
 
 OR
 
-- docker run -p 3000:3000 ghcr.io/ea7klk/bm-lastheard-node:latest
+- ```docker run -p 3000:3000 ghcr.io/ea7klk/bm-lastheard-node:v0.6```
+OR 
+- ```docker run -p 3000:3000 -v ./data:/app/data ghcr.io/ea7klk/bm-lastheard-node:v0.6```
 
-Right now there is no way (yet) to persist the database outside of the container. To be added soon. 
+You can also use the "latest" tag, however it's considered bad practice when using containers in general.  
+
+The second option allows for saving the database to a volume to persist data between container restarts. 
 
 The database will be created automatically if it's not present. 
 

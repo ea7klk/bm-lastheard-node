@@ -57,4 +57,42 @@ router.get('/top-sourcecalls', (req, res) => {
   });
 });
 
+// Route to get the 20 most frequent DestinationID for spanish groups (starts with "21")
+router.get('/top-destinations-ea', (req, res) => {
+  db.all(`
+    SELECT DestinationName, DestinationID, COUNT(*) AS count 
+    FROM lastheard 
+    WHERE CAST(DestinationID AS TEXT) LIKE '21%' AND
+      CAST(DestinationID AS TEXT) NOT LIKE '216%' AND
+      CAST(DestinationID AS TEXT) NOT LIKE '219%'
+    GROUP BY DestinationName, DestinationID 
+    ORDER BY count DESC 
+    LIMIT 20
+  `, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
+router.get('/top-sourcecallsEA', (req, res) => {
+  db.all(`
+    SELECT SourceCall, SourceID, TalkerAlias, COUNT(*) AS count 
+    FROM lastheard 
+    WHERE SourceCall != '' and 
+      CAST(SourceID AS TEXT) LIKE '21%' AND
+      CAST(SourceID AS TEXT) NOT LIKE '216%' AND
+      CAST(SourceID AS TEXT) NOT LIKE '219%'
+    GROUP BY SourceCall, TalkerAlias 
+    ORDER BY count DESC 
+    LIMIT 20
+  `, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
 module.exports = router;

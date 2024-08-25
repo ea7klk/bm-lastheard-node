@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    table {
+      width: 80%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <h2>Total Record Count: <span id="record-count">Loading...</span></h2>
+  <h2>Top 20 Source Calls</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Source Call</th>
+        <th>Talker Alias</th>
+        <th>Count</th>
+        <th>Percentage</th>
+      </tr>
+    </thead>
+    <tbody id="top-sourcecalls">
+      <!-- Data will be inserted here -->
+    </tbody>
+  </table>
+
+  <script>
+    async function fetchDashboardData() {
+      try {
+        const [recordCountResponse, topSourceCallsResponse] = await Promise.all([
+          fetch('/record-count'),
+          fetch('/top-sourcecallsEA')
+        ]);
+
+        const recordCountData = await recordCountResponse.json();
+        const topSourceCallsData = await topSourceCallsResponse.json();
+
+        document.getElementById('record-count').textContent = recordCountData.count;
+
+        const topSourceCallsTable = document.getElementById('top-sourcecalls');
+        topSourceCallsTable.innerHTML = '';
+
+        topSourceCallsData.forEach(sourceCall => {
+          const percentage = ((sourceCall.count / recordCountData.count) * 100).toFixed(2);
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${sourceCall.SourceCall}</td>
+            <td>${sourceCall.TalkerAlias}</td>
+            <td>${sourceCall.count}</td>
+            <td>${percentage}%</td>
+          `;
+          topSourceCallsTable.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      }
+    }
+
+    // Fetch dashboard data on page load
+    fetchDashboardData();
+
+    // Refresh the page every 5 seconds
+    setInterval(fetchDashboardData, 5000);
+  </script>
+</body>
+</html>
