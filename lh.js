@@ -77,7 +77,7 @@ const socket = io('https://api.brandmeister.network', {
 });
 
 // Step 3: Open a SQLite database
-const db = new sqlite3.Database('lastheard.db');
+const db = new sqlite3.Database('data/lastheard.db');
 
 // Step 4: Create a table if it doesn't exist
 db.serialize(() => {
