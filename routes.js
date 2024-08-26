@@ -157,24 +157,24 @@ router.get('/top-sourcecalls-rangeEA', (req, res) => {
   let query = `
     SELECT SourceCall, SourceID, TalkerAlias, COUNT(*) AS count
     FROM lastheard 
-    WHERE SourceCall != '' and
-      CAST(SourceID AS TEXT) LIKE '21%' AND
-      CAST(SourceID AS TEXT) NOT LIKE '216%' AND
-      CAST(SourceID AS TEXT) NOT LIKE '219%'
-  `;
+    WHERE SourceCall != ''
+      AND CAST(SourceID AS TEXT) LIKE '21%'
+      AND CAST(SourceID AS TEXT) NOT LIKE '216%' 
+      AND CAST(SourceID AS TEXT) NOT LIKE '219%'
+      `;
   const params = [];
   
   if (start && end) {
-    params.push(start, end);
-    query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
+    // params.push(start, end);
+    query += `AND datetime(Timestamp) > DATETIME('${start}') 
+      AND datetime(Timestamp) < DATETIME('${end}')
+    `;
   }
 
-  query += `
-    GROUP BY SourceCall, TalkerAlias 
+  query += `GROUP BY SourceCall, TalkerAlias 
     ORDER BY count DESC 
-    LIMIT 20
-  `;
-  console.log(query, params);
+    LIMIT 20`;
+  console.log(query);
   db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
