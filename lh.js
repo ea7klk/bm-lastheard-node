@@ -60,9 +60,9 @@ socket.on('mqtt', (data) => {
   const duration = lastheard.Stop - lastheard.Start;
   lastheard["Duration"] = duration;
 
-  // Check if lastheard.Duration is < 5
-  if (lastheard.Duration < 5) {
-    return; // Do not print if Duration is < 5
+  // Check if lastheard.Duration is < 2 (Avoid kerchunks)
+  if (lastheard.Duration < 2) {
+    return; 
   }
 
   // Skip if lastheard.DestinationName is empty
@@ -70,7 +70,12 @@ socket.on('mqtt', (data) => {
     return;
   }
 
-  // Skip if lastheard.DestinationCall is empty
+  // Skip if lastheard.SourceCall is empty)
+  if (!lastheard.SourceCall) {
+    return;
+  }
+
+  // Skip if lastheard.DestinationCall is not empty
   if (lastheard.DestinationCall) {
     return;
   }
