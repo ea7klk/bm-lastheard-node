@@ -92,6 +92,30 @@ router.get('/record-count', (req, res) => {
   });
 });
 
+// Route to get the count of records in the database filtered by time range
+router.get('/record-count-range', (req, res) => {
+  const { range } = req.query;
+  const [start, end] = getTimeRange(range);
+  console.log(range, start, end);
+  let query = `
+    SELECT COUNT(*) AS count FROM lastheard
+      `;
+  const params = [];
+  if (start && end) {
+    // params.push(start, end);
+    query += `WHERE datetime(Timestamp) > DATETIME('${start}') 
+      AND datetime(Timestamp) < DATETIME('${end}')
+    `;
+  }
+  console.log(query);
+  db.get(query, (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ count: row.count });
+  });
+});
+
 // Route to get the 20 most frequent SourceCall
 router.get('/top-sourcecalls', (req, res) => {
   db.all(`
@@ -149,7 +173,6 @@ router.get('/top-sourcecallsEA', (req, res) => {
 });
 
 // Route to get the 20 most frequent SourceID filtered by time range for spanish groups (starts with "21")
-
 router.get('/top-sourcecalls-rangeEA', (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
