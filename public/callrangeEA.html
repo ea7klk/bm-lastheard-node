@@ -37,6 +37,8 @@
   <div class="filter-container">
     <label for="time-range">Time Range:</label>
     <select id="time-range" onchange="fetchDashboardData()">
+      <option value="last-15-minutes">Last 15 Minutes</option>
+      <option value="last-30-minutes">Last 30 Minutes</option>
       <option value="last-hour">Last Hour</option>
       <option value="last-12-hours">Last 12 Hours</option>
       <option value="today">Today</option>
@@ -73,7 +75,7 @@
 
       try {
         const [recordCountResponse, topSourceCallsResponse] = await Promise.all([
-          fetch(`/record-count-range?${queryParams.toString()}`),
+          fetch(`/record-count-range-ea?${queryParams.toString()}`),
           fetch(`/top-sourcecalls-rangeEA?${queryParams.toString()}`)
         ]);
 
