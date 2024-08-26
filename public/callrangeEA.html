@@ -73,7 +73,7 @@
 
       try {
         const [recordCountResponse, topSourceCallsResponse] = await Promise.all([
-          fetch(`/record-count?${queryParams.toString()}`),
+          fetch(`/record-count-range?${queryParams.toString()}`),
           fetch(`/top-sourcecalls-rangeEA?${queryParams.toString()}`)
         ]);
 
