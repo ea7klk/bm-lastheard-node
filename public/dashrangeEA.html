@@ -52,17 +52,18 @@
     </select>
   </div>
   <h2>Total Record Count: <span id="record-count">Loading...</span></h2>
-  <h2>Top 20 Source Calls for EA (Spain)</h2>
+  <h2>Top 20 Destination TGs for EA (Spain)</h2>
   <table>
     <thead>
       <tr>
-        <th>Source Call</th>
-        <th>Talker Alias</th>
+        <th>TG Number</th>
+        <th>TG Name</th>
         <th>Count</th>
         <th>Percentage</th>
+        <th>Total QSO Duration</th>
       </tr>
     </thead>
-    <tbody id="top-sourcecalls">
+    <tbody id="top-DestinationIDs">
       <!-- Data will be inserted here -->
     </tbody>
   </table>
@@ -75,29 +76,30 @@
       queryParams.append('range', timeRange);
 
       try {
-        const [recordCountResponse, topSourceCallsResponse] = await Promise.all([
+        const [recordCountResponse, topDestinationIDsResponse] = await Promise.all([
           fetch(`/record-count-range-ea?${queryParams.toString()}`),
-          fetch(`/top-sourcecalls-rangeEA?${queryParams.toString()}`)
+          fetch(`/top-destination-rangeEA?${queryParams.toString()}`)
         ]);
 
         const recordCountData = await recordCountResponse.json();
-        const topSourceCallsData = await topSourceCallsResponse.json();
+        const topDestinationIDsData = await topDestinationIDsResponse.json();
 
         document.getElementById('record-count').textContent = recordCountData.count;
 
-        const topSourceCallsTable = document.getElementById('top-sourcecalls');
-        topSourceCallsTable.innerHTML = '';
+        const topDestinationIDsTable = document.getElementById('top-DestinationIDs');
+        topDestinationIDsTable.innerHTML = '';
 
-        topSourceCallsData.forEach(sourceCall => {
-          const percentage = ((sourceCall.count / recordCountData.count) * 100).toFixed(2);
+        topDestinationIDsData.forEach(DestinationID => {
+          const percentage = ((DestinationID.count / recordCountData.count) * 100).toFixed(2);
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${sourceCall.SourceCall}</td>
-            <td>${sourceCall.TalkerAlias}</td>
-            <td>${sourceCall.count}</td>
+            <td>${DestinationID.DestinationID}</td>
+            <td>${DestinationID.DestinationName}</td>
+            <td>${DestinationID.count}</td>
             <td>${percentage}%</td>
+            <td>${DestinationID.totalDuration} sec.</td>
           `;
-          topSourceCallsTable.appendChild(row);
+          topDestinationIDsTable.appendChild(row);
         });
       } catch (error) {
         console.error('Error fetching dashboard data:', error);

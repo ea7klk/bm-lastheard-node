@@ -24,11 +24,16 @@ function getTimeRange(range) {
         moment().subtract(1, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
         now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
       ];
-    case 'last-12-hours':
+    case 'last-6-hours':
       return [
-        moment().subtract(12, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
+        moment().subtract(6, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
         now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
       ];
+      case 'last-12-hours':
+        return [
+          moment().subtract(12, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
+          now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+        ];
     case 'today':
       return [
         moment().startOf('day').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
@@ -182,6 +187,40 @@ router.get('/top-destinations-ea', (req, res) => {
     ORDER BY count DESC 
     LIMIT 20
   `, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
+// Route to get the 20 most frequent DestinationID filtered by time range for spanish groups (starts with "21")
+router.get('/top-destination-rangeEA', (req, res) => {
+  const { range } = req.query;
+  const [start, end] = getTimeRange(range);
+  console.log(range, start, end);
+  let query = `
+    SELECT DestinationName, DestinationID, COUNT(*) AS count, sum(Duration) as totalDuration 
+    FROM lastheard 
+    WHERE SourceCall != ''
+      AND CAST(DestinationID AS TEXT) LIKE '21%'
+      AND CAST(DestinationID AS TEXT) NOT LIKE '216%' 
+      AND CAST(DestinationID AS TEXT) NOT LIKE '219%'
+      `;
+  const params = [];
+  
+  if (start && end) {
+    // params.push(start, end);
+    query += `AND datetime(Timestamp) > DATETIME('${start}') 
+      AND datetime(Timestamp) < DATETIME('${end}')
+    `;
+  }
+
+  query += `GROUP BY DestinationName 
+    ORDER BY count DESC 
+    LIMIT 20`;
+  console.log(query);
+  db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
