@@ -133,7 +133,7 @@ router.get('/record-count', (req, res) => {
 router.get('/record-count-range', (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
+  // console.log(range, start, end);
   let query = `
     SELECT COUNT(*) AS count FROM lastheard
       `;
@@ -144,7 +144,7 @@ router.get('/record-count-range', (req, res) => {
       AND datetime(Timestamp) < DATETIME('${end}')
     `;
   }
-  console.log(query);
+  // console.log(query);
   db.get(query, (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -157,7 +157,7 @@ router.get('/record-count-range', (req, res) => {
 router.get('/record-count-range-ea', (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
+  // console.log(range, start, end);
   let query = `
     SELECT COUNT(*) AS count FROM lastheard
     WHERE CAST(DestinationID AS TEXT) LIKE '214%' 
@@ -169,7 +169,7 @@ router.get('/record-count-range-ea', (req, res) => {
       AND datetime(Timestamp) < DATETIME('${end}')
     `;
   }
-  console.log(query);
+  // console.log(query);
   db.get(query, (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -182,7 +182,7 @@ router.get('/record-count-range-ea', (req, res) => {
 router.get('/record-count-range-country', (req, res) => {
   const { range, country } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, country, start, end);
+  // console.log(range, country, start, end);
   
   let query = `
     SELECT COUNT(*) AS count FROM lastheard
@@ -196,7 +196,7 @@ router.get('/record-count-range-country', (req, res) => {
     `;
   }
   
-  console.log(query);
+  // console.log(query);
   db.get(query, (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -243,7 +243,7 @@ router.get('/top-destinations-ea', (req, res) => {
 router.get('/top-destination-range-country', (req, res) => {
   const { range, country } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, country, start, end);
+  // console.log(range, country, start, end);
   
   let query = `
     SELECT DestinationName, DestinationID, COUNT(*) AS count, sum(Duration) as totalDuration 
@@ -262,7 +262,7 @@ router.get('/top-destination-range-country', (req, res) => {
   query += `GROUP BY DestinationName 
             ORDER BY count DESC 
             LIMIT 20`;
-  console.log(query);
+  // console.log(query);
   db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -294,7 +294,7 @@ router.get('/top-sourcecallsEA', (req, res) => {
 router.get('/top-sourcecalls-rangeEA', (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
+  // console.log(range, start, end);
   let query = `
     SELECT SourceCall, SourceID, TalkerAlias, COUNT(*) AS count
     FROM lastheard 
@@ -313,7 +313,7 @@ router.get('/top-sourcecalls-rangeEA', (req, res) => {
   query += `GROUP BY SourceCall, TalkerAlias 
     ORDER BY count DESC 
     LIMIT 20`;
-  console.log(query);
+  // console.log(query);
   db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
