@@ -8,13 +8,125 @@ const db = new sqlite3.Database('data/lastheard.db');
 // Add a function to allow selecting countries
 function getCountry(country) {
   switch (country) {
-    case 'EA':
+    case 'AT':
       return `
-        CAST(DestinationID AS TEXT) LIKE '214%' 
+        CAST(DestinationID AS TEXT) LIKE '232%' 
+      `;
+    case 'BE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '206%' 
+      `;
+    case 'BG':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '284%' 
+      `;
+    case 'CH':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '228%' 
+      `;
+    case 'CY':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '280%' 
+      `;  
+    case 'CZ':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '255%' 
       `;
     case 'DE':
       return `
-        (CAST(DestinationID AS TEXT) LIKE '262%' OR  CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')
+        (CAST(DestinationID AS TEXT) LIKE '262%' OR CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')
+      `;
+    case 'DK':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '238%' 
+      `;
+    case 'EE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '248%' 
+      `;
+    case 'ES':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '214%' 
+      `;
+    case 'FI':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '244%' 
+      `;
+    case 'FR':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '208%'
+      `;
+    case 'GB':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '235%' 
+      `;
+    case 'GR':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '202%' 
+      `;
+    case 'HR':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '219%' 
+      `;
+    case 'HU':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '239%' 
+      `;
+    case 'IE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '272%' 
+      `;
+    case 'IT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '222%'
+      `;
+    case 'LT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '246%' 
+      `;
+    case 'LU':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '270%' 
+      `;
+    case 'LV':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '247%' 
+      `;
+    case 'MT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '278%' 
+      `;
+    case 'NL':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '204%'
+      `;
+    case 'PL':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '260%' 
+      `;
+    case 'PT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '268%' 
+      `;
+    case 'RO':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '226%' 
+      `;
+    case 'SE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '240%' 
+      `;
+    case 'SI':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '293%' 
+      `;
+    case 'SK':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '231%' 
+      `;
+    case 'UK':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '235%' 
       `;
     case 'All':
       return `
@@ -86,16 +198,6 @@ function getTimeRange(range) {
         moment().subtract(7, 'days').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
         now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
       ];
-    case 'this-month':
-      return [
-        moment().startOf('month').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-month':
-      return [
-        moment().subtract(1, 'months').startOf('month').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.subtract(1, 'months').endOf('month').toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
     case 'all':
       return [null, null];
     default:
@@ -136,6 +238,26 @@ router.get('/record-count', (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     res.json({ count: row.count });
+  });
+});
+
+// Route to get the oldest record in the database
+router.get('/record-oldest', (req, res) => {
+  db.get('SELECT MIN(DATETIME(Timestamp)) AS oldest from lastheard', (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ oldest: row.oldest });
+  });
+});
+
+// Route to get the newest record in the database
+router.get('/record-newest', (req, res) => {
+  db.get('SELECT MAX(DATETIME(Timestamp)) AS newest from lastheard', (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ newest: row.newest });
   });
 });
 

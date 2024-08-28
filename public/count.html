@@ -13,18 +13,50 @@
   </style>
 </head>
 <body>
-  <h1>Number of Records in the Table</h1>
+  <h1>Number of Records in the LastHeard Table</h1>
   <p id="record-count">Loading...</p>
+  <p id="record-oldest">Loading...</p>
+  <p id="record-newest">Loading...</p>
 
   <script>
     async function fetchRecordCount() {
       try {
-        const response = await fetch('/record-count');
-        const data = await response.json();
-        document.getElementById('record-count').textContent = data.count;
+        const count = await fetch('/record-count');
+        const countData = await count.json();
+        const oldest = await fetch('/record-oldest');
+        const oldestData = await oldest.json();
+        const newest = await fetch('/record-newest');
+        const newestData = await newest.json();
+        console.log(countData);
+
+        document.getElementById('record-count').textContent = `There are ${countData.count} records currently in the LastHeard table`;
+        document.getElementById('record-oldest').textContent = `The oldest record in the database is dated ${oldestData.oldest} UTC`;
+        document.getElementById('record-newest').textContent = `The newest record in the database is dated ${newestData.newest} UTC`;
       } catch (error) {
         console.error('Error fetching record count:', error);
         document.getElementById('record-count').textContent = 'Error loading data';
+      }
+    }
+
+    async function fetchRecordOldest() {
+      try {
+        const response = await fetch('/record-oldest');
+        const data = await response.json();
+        document.getElementById('record-oldest').textContent = `The oldest record in the database is dated ${data.oldest}`;
+      } catch (error) {
+        console.error('Error fetching oldest record:', error);
+        document.getElementById('record-oldest').textContent = 'Error loading oldest record';
+      }
+    }
+
+    async function fetchRecordNewest() {
+      try {
+        const response = await fetch('/record-newest');
+        const data = await response.json();
+        document.getElementById('record-newest').textContent = `The newest record in the database is dated ${data.newest}`;
+      } catch (error) {
+        console.error('Error fetching newest record:', error);
+        document.getElementById('record-newest').textContent = 'Error loading newest record';
       }
     }
 

@@ -8,7 +8,7 @@ The main purpose of this is to teach myself some NodeJS, and maybe provide a use
 Copilot was spot on for most of the things, the only issues I had to change manually were some confusions about treating JSON objects as strings and the portions to filter out some data. 
 
 - It connects to the BM Lastheard websocket (socket.io).  
-- It gets all the data, ignores non-group calls and calls shorter than 5 seconds.  
+- It gets all the data, ignores non-group calls and calls shorter than 2 seconds to discard kerchunks.  
 - It calculates the duration of the call
 - It inserts this data into an SQLITE database.  
 - I'm also providing some simple web pages to display some of the data. 
