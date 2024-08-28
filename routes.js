@@ -14,7 +14,7 @@ function getCountry(country) {
       `;
     case 'DE':
       return `
-        CAST(DestinationID AS TEXT) LIKE '262%' OR  CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%'
+        (CAST(DestinationID AS TEXT) LIKE '262%' OR  CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')
       `;
     case 'All':
       return `
@@ -31,6 +31,16 @@ function getCountry(country) {
 function getTimeRange(range) {
   const now = moment();
   switch (range) {
+    case 'last-minute':
+      return [
+        moment().subtract(1, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
+        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      ];
+    case 'last-5-minutes':
+      return [
+        moment().subtract(5, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
+        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      ];
     case 'last-15-minutes':
       return [
         moment().subtract(15, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 

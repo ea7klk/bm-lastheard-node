@@ -56,7 +56,9 @@
   <div class="filter-container">
     <label for="time-range">Time Range:</label>
     <select id="time-range" onchange="fetchDashboardData()">
-      <option value="last-15-minutes">Last 15 Minutes</option>
+      <option value="last-minute" selected>Last Minute</option>
+      <option value="last-5-minutes">Last 5 Minutes</option>
+      <option value="last-15-minutes" selected>Last 15 Minutes</option>
       <option value="last-30-minutes">Last 30 Minutes</option>
       <option value="last-hour">Last Hour</option>
       <option value="last-6-hours">Last 6 Hours</option>
@@ -71,7 +73,7 @@
     </select>
     <label for="country-selector">Select Country:</label>
     <select id="country-selector" onchange="fetchDashboardData()">
-        <option value="All">All</option>
+        <option value="All" selected> All</option>
         <option value="EA">EA</option>
         <option value="DE">DE</option>
     </select>
