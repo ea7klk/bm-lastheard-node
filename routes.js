@@ -8,7 +8,7 @@ const db = new sqlite3.Database('data/lastheard.db');
 // Add a function to allow selecting countries
 function getCountry(country) {
   switch (country) {
-    case 'EA':
+    case 'ES':
       return `
         CAST(DestinationID AS TEXT) LIKE '214%' 
       `;
