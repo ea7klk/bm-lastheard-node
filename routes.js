@@ -239,38 +239,6 @@ router.get('/top-destinations-ea', (req, res) => {
   });
 });
 
-// Route to get the 20 most frequent DestinationID filtered by time range for spanish groups (starts with "21")
-router.get('/top-destination-rangeEA', (req, res) => {
-  const { range } = req.query;
-  const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
-  let query = `
-    SELECT DestinationName, DestinationID, COUNT(*) AS count, sum(Duration) as totalDuration 
-    FROM lastheard 
-    WHERE SourceCall != ''
-      AND CAST(DestinationID AS TEXT) LIKE '214%'
-      `;
-  const params = [];
-  
-  if (start && end) {
-    // params.push(start, end);
-    query += `AND datetime(Timestamp) > DATETIME('${start}') 
-      AND datetime(Timestamp) < DATETIME('${end}')
-    `;
-  }
-
-  query += `GROUP BY DestinationName 
-    ORDER BY count DESC 
-    LIMIT 20`;
-  console.log(query);
-  db.all(query, params, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(rows);
-  });
-});
-
 // Route to get the 20 most frequent DestinationID filtered by time range and country
 router.get('/top-destination-range-country', (req, res) => {
   const { range, country } = req.query;
@@ -354,5 +322,4 @@ router.get('/top-sourcecalls-rangeEA', (req, res) => {
   });
 });
   
-
 module.exports = router;
