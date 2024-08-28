@@ -50,6 +50,12 @@
       <option value="last-month">Last Month</option>
       <option value="all">All</option>
     </select>
+    <label for="country-selector">Select Country:</label>
+    <select id="country-selector" onchange="fetchDashboardData()">
+        <option value="All">All</option>
+        <option value="EA">EA</option>
+        <option value="DE">DE</option>
+    </select>
   </div>
   <h2>Total Record Count: <span id="record-count">Loading...</span></h2>
   <h2>Top 20 Destination TGs for EA (Spain)</h2>
@@ -71,14 +77,16 @@
   <script>
     async function fetchDashboardData() {
       const timeRange = document.getElementById('time-range').value;
+      const country = document.getElementById('country-selector').value;
 
       const queryParams = new URLSearchParams();
       queryParams.append('range', timeRange);
+      queryParams.append('country', country);
 
       try {
         const [recordCountResponse, topDestinationIDsResponse] = await Promise.all([
-          fetch(`/record-count-range-ea?${queryParams.toString()}`),
-          fetch(`/top-destination-rangeEA?${queryParams.toString()}`)
+          fetch(`/record-count-range-country?${queryParams.toString()}`),
+          fetch(`/top-destination-range-country?${queryParams.toString()}`)
         ]);
 
         const recordCountData = await recordCountResponse.json();
