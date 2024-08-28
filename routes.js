@@ -14,7 +14,7 @@ function getCountry(country) {
       `;
     case 'DE':
       return `
-        CAST(DestinationID AS TEXT) LIKE '262%' 
+        CAST(DestinationID AS TEXT) LIKE '262%' OR  CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%'
       `;
     case 'All':
       return `
