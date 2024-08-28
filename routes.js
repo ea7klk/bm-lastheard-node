@@ -139,6 +139,26 @@ router.get('/record-count', (req, res) => {
   });
 });
 
+// Route to get the oldest record in the database
+router.get('/record-oldest', (req, res) => {
+  db.get('SELECT MIN(DATETIME(Timestamp)) AS oldest from lastheard', (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ oldest: row.oldest });
+  });
+});
+
+// Route to get the newest record in the database
+router.get('/record-newest', (req, res) => {
+  db.get('SELECT MAX(DATETIME(Timestamp)) AS newest from lastheard', (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ newest: row.newest });
+  });
+});
+
 // Route to get the count of records in the database filtered by time range
 router.get('/record-count-range', (req, res) => {
   const { range } = req.query;
