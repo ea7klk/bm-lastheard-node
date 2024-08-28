@@ -56,6 +56,6 @@ jobs:
         docker pull ghcr.io/${{ github.repository }}:latest
         docker run --rm -d -p 3000:3000 --name bm-lastheard-node ghcr.io/${{ github.repository }}:latest
         sleep 10
-        curl --fail http://localhost:3000/dash.html
+        curl --fail http://localhost:3000/dashmulti.html
         curl --fail http://localhost:3000/call.html
         docker stop bm-lastheard-node

@@ -8,10 +8,10 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 50px;
+      margin-top: 20px;
     }
     table {
-      width: 80%;
+      width: 100%;
       margin: 0 auto;
       border-collapse: collapse;
     }
@@ -19,16 +19,35 @@
       border: 1px solid black;
       padding: 8px;
       text-align: left;
+      word-wrap: break-word;
     }
     th {
       background-color: #f2f2f2;
     }
     .filter-container {
       margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .filter-container select {
-      padding: 5px;
-      margin: 0 10px;
+      padding: 10px;
+      margin: 5px 0;
+      width: 80%;
+      max-width: 300px;
+    }
+    h2 {
+      font-size: 1.5em;
+    }
+    @media (min-width: 600px) {
+      .filter-container {
+        flex-direction: row;
+        justify-content: center;
+      }
+      .filter-container select {
+        width: auto;
+        margin: 0 10px;
+      }
     }
   </style>
 </head>
@@ -37,7 +56,9 @@
   <div class="filter-container">
     <label for="time-range">Time Range:</label>
     <select id="time-range" onchange="fetchDashboardData()">
-      <option value="last-15-minutes">Last 15 Minutes</option>
+      <option value="last-minute" selected>Last Minute</option>
+      <option value="last-5-minutes">Last 5 Minutes</option>
+      <option value="last-15-minutes" selected>Last 15 Minutes</option>
       <option value="last-30-minutes">Last 30 Minutes</option>
       <option value="last-hour">Last Hour</option>
       <option value="last-6-hours">Last 6 Hours</option>
@@ -50,9 +71,15 @@
       <option value="last-month">Last Month</option>
       <option value="all">All</option>
     </select>
+    <label for="country-selector">Select Country:</label>
+    <select id="country-selector" onchange="fetchDashboardData()">
+        <option value="All" selected> All</option>
+        <option value="EA">EA</option>
+        <option value="DE">DE</option>
+    </select>
   </div>
   <h2>Total Record Count: <span id="record-count">Loading...</span></h2>
-  <h2>Top 20 Destination TGs for EA (Spain)</h2>
+  <h2 id="country-title">Top 20 Destination TGs for EA (Spain)</h2>
   <table>
     <thead>
       <tr>
@@ -71,14 +98,16 @@
   <script>
     async function fetchDashboardData() {
       const timeRange = document.getElementById('time-range').value;
+      const country = document.getElementById('country-selector').value;
 
       const queryParams = new URLSearchParams();
       queryParams.append('range', timeRange);
+      queryParams.append('country', country);
 
       try {
         const [recordCountResponse, topDestinationIDsResponse] = await Promise.all([
-          fetch(`/record-count-range-ea?${queryParams.toString()}`),
-          fetch(`/top-destination-rangeEA?${queryParams.toString()}`)
+          fetch(`/record-count-range-country?${queryParams.toString()}`),
+          fetch(`/top-destination-range-country?${queryParams.toString()}`)
         ]);
 
         const recordCountData = await recordCountResponse.json();
@@ -101,6 +130,10 @@
           `;
           topDestinationIDsTable.appendChild(row);
         });
+
+        // Update the country title
+        document.getElementById('country-title').textContent = `Top 20 Destination TGs for ${country}`;
+
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       }

@@ -5,10 +5,42 @@ const moment = require('moment');
 
 const db = new sqlite3.Database('data/lastheard.db');
 
-// Adding function to permit querying by some time ranges in the future: 
+// Add a function to allow selecting countries
+function getCountry(country) {
+  switch (country) {
+    case 'EA':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '214%' 
+      `;
+    case 'DE':
+      return `
+        (CAST(DestinationID AS TEXT) LIKE '262%' OR  CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')
+      `;
+    case 'All':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '%' 
+      `;
+    default:
+      return `
+        CAST(DestinationID AS TEXT) LIKE '%' 
+      `;
+  }
+}
+
+// Adding function to permit querying by some time ranges: 
 function getTimeRange(range) {
   const now = moment();
   switch (range) {
+    case 'last-minute':
+      return [
+        moment().subtract(1, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
+        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      ];
+    case 'last-5-minutes':
+      return [
+        moment().subtract(5, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
+        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      ];
     case 'last-15-minutes':
       return [
         moment().subtract(15, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
@@ -111,7 +143,7 @@ router.get('/record-count', (req, res) => {
 router.get('/record-count-range', (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
+  // console.log(range, start, end);
   let query = `
     SELECT COUNT(*) AS count FROM lastheard
       `;
@@ -122,7 +154,7 @@ router.get('/record-count-range', (req, res) => {
       AND datetime(Timestamp) < DATETIME('${end}')
     `;
   }
-  console.log(query);
+  // console.log(query);
   db.get(query, (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -135,12 +167,10 @@ router.get('/record-count-range', (req, res) => {
 router.get('/record-count-range-ea', (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
+  // console.log(range, start, end);
   let query = `
     SELECT COUNT(*) AS count FROM lastheard
-    WHERE CAST(DestinationID AS TEXT) LIKE '21%' AND
-      CAST(DestinationID AS TEXT) NOT LIKE '216%' AND
-      CAST(DestinationID AS TEXT) NOT LIKE '219%'
+    WHERE CAST(DestinationID AS TEXT) LIKE '214%' 
       `;
   const params = [];
   if (start && end) {
@@ -149,7 +179,34 @@ router.get('/record-count-range-ea', (req, res) => {
       AND datetime(Timestamp) < DATETIME('${end}')
     `;
   }
-  console.log(query);
+  // console.log(query);
+  db.get(query, (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ count: row.count });
+  });
+});
+
+// Route to get the count of records in the database filtered by time range and country
+router.get('/record-count-range-country', (req, res) => {
+  const { range, country } = req.query;
+  const [start, end] = getTimeRange(range);
+  // console.log(range, country, start, end);
+  
+  let query = `
+    SELECT COUNT(*) AS count FROM lastheard
+    WHERE ${getCountry(country)}
+  `;
+  const params = [];
+  
+  if (start && end) {
+    query += `AND datetime(Timestamp) > DATETIME('${start}') 
+              AND datetime(Timestamp) < DATETIME('${end}')
+    `;
+  }
+  
+  // console.log(query);
   db.get(query, (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -180,9 +237,7 @@ router.get('/top-destinations-ea', (req, res) => {
   db.all(`
     SELECT DestinationName, DestinationID, COUNT(*) AS count 
     FROM lastheard 
-    WHERE CAST(DestinationID AS TEXT) LIKE '21%' AND
-      CAST(DestinationID AS TEXT) NOT LIKE '216%' AND
-      CAST(DestinationID AS TEXT) NOT LIKE '219%'
+    WHERE CAST(DestinationID AS TEXT) LIKE '214%' 
     GROUP BY DestinationName, DestinationID 
     ORDER BY count DESC 
     LIMIT 20
@@ -194,32 +249,30 @@ router.get('/top-destinations-ea', (req, res) => {
   });
 });
 
-// Route to get the 20 most frequent DestinationID filtered by time range for spanish groups (starts with "21")
-router.get('/top-destination-rangeEA', (req, res) => {
-  const { range } = req.query;
+// Route to get the 20 most frequent DestinationID filtered by time range and country
+router.get('/top-destination-range-country', (req, res) => {
+  const { range, country } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
+  // console.log(range, country, start, end);
+  
   let query = `
     SELECT DestinationName, DestinationID, COUNT(*) AS count, sum(Duration) as totalDuration 
     FROM lastheard 
     WHERE SourceCall != ''
-      AND CAST(DestinationID AS TEXT) LIKE '21%'
-      AND CAST(DestinationID AS TEXT) NOT LIKE '216%' 
-      AND CAST(DestinationID AS TEXT) NOT LIKE '219%'
-      `;
+      AND ${getCountry(country)}
+  `;
   const params = [];
   
   if (start && end) {
-    // params.push(start, end);
     query += `AND datetime(Timestamp) > DATETIME('${start}') 
-      AND datetime(Timestamp) < DATETIME('${end}')
+              AND datetime(Timestamp) < DATETIME('${end}')
     `;
   }
 
   query += `GROUP BY DestinationName 
-    ORDER BY count DESC 
-    LIMIT 20`;
-  console.log(query);
+            ORDER BY count DESC 
+            LIMIT 20`;
+  // console.log(query);
   db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -228,15 +281,14 @@ router.get('/top-destination-rangeEA', (req, res) => {
   });
 });
 
+
 // Route to get the 20 most frequent SourceCall EA (Spain)
 router.get('/top-sourcecallsEA', (req, res) => {
   db.all(`
     SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
     FROM lastheard 
     WHERE SourceCall != '' and
-      CAST(SourceID AS TEXT) LIKE '21%' AND
-      CAST(SourceID AS TEXT) NOT LIKE '216%' AND
-      CAST(SourceID AS TEXT) NOT LIKE '219%'
+      CAST(SourceID AS TEXT) LIKE '214%' 
     GROUP BY SourceCall, TalkerAlias 
     ORDER BY count DESC 
     LIMIT 20
@@ -252,14 +304,12 @@ router.get('/top-sourcecallsEA', (req, res) => {
 router.get('/top-sourcecalls-rangeEA', (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  console.log(range, start, end);
+  // console.log(range, start, end);
   let query = `
     SELECT SourceCall, SourceID, TalkerAlias, COUNT(*) AS count
     FROM lastheard 
     WHERE SourceCall != ''
-      AND CAST(SourceID AS TEXT) LIKE '21%'
-      AND CAST(SourceID AS TEXT) NOT LIKE '216%' 
-      AND CAST(SourceID AS TEXT) NOT LIKE '219%'
+      AND CAST(SourceID AS TEXT) LIKE '214%'
       `;
   const params = [];
   
@@ -273,7 +323,7 @@ router.get('/top-sourcecalls-rangeEA', (req, res) => {
   query += `GROUP BY SourceCall, TalkerAlias 
     ORDER BY count DESC 
     LIMIT 20`;
-  console.log(query);
+  // console.log(query);
   db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -282,5 +332,4 @@ router.get('/top-sourcecalls-rangeEA', (req, res) => {
   });
 });
   
-
 module.exports = router;
