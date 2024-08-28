@@ -8,17 +8,125 @@ const db = new sqlite3.Database('data/lastheard.db');
 // Add a function to allow selecting countries
 function getCountry(country) {
   switch (country) {
+    case 'AT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '232%' 
+      `;
+    case 'BE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '206%' 
+      `;
+    case 'BG':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '284%' 
+      `;
+    case 'CH':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '228%' 
+      `;
+    case 'CY':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '280%' 
+      `;  
+    case 'CZ':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '255%' 
+      `;
+    case 'DE':
+      return `
+        (CAST(DestinationID AS TEXT) LIKE '262%' OR CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')
+      `;
+    case 'DK':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '238%' 
+      `;
+    case 'EE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '248%' 
+      `;
     case 'ES':
       return `
         CAST(DestinationID AS TEXT) LIKE '214%' 
       `;
-    case 'DE':
+    case 'FI':
       return `
-        (CAST(DestinationID AS TEXT) LIKE '262%' OR  CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')
+        CAST(DestinationID AS TEXT) LIKE '244%' 
       `;
     case 'FR':
       return `
         CAST(DestinationID AS TEXT) LIKE '208%'
+      `;
+    case 'GB':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '235%' 
+      `;
+    case 'GR':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '202%' 
+      `;
+    case 'HR':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '219%' 
+      `;
+    case 'HU':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '239%' 
+      `;
+    case 'IE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '272%' 
+      `;
+    case 'IT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '222%'
+      `;
+    case 'LT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '246%' 
+      `;
+    case 'LU':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '270%' 
+      `;
+    case 'LV':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '247%' 
+      `;
+    case 'MT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '278%' 
+      `;
+    case 'NL':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '204%'
+      `;
+    case 'PL':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '260%' 
+      `;
+    case 'PT':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '268%' 
+      `;
+    case 'RO':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '226%' 
+      `;
+    case 'SE':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '240%' 
+      `;
+    case 'SI':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '293%' 
+      `;
+    case 'SK':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '231%' 
+      `;
+    case 'UK':
+      return `
+        CAST(DestinationID AS TEXT) LIKE '235%' 
       `;
     case 'All':
       return `
