@@ -86,16 +86,6 @@ function getTimeRange(range) {
         moment().subtract(7, 'days').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
         now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
       ];
-    case 'this-month':
-      return [
-        moment().startOf('month').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-month':
-      return [
-        moment().subtract(1, 'months').startOf('month').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.subtract(1, 'months').endOf('month').toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
     case 'all':
       return [null, null];
     default:
