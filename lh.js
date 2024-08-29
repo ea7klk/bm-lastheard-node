@@ -1,6 +1,3 @@
-// Step 1: Install dependencies
-// Run `npm install socket.io-client sqlite3 express` in your terminal
-
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -11,7 +8,6 @@ app.use(express.static('public'));
 
 // use the routes defined in routes.js
 app.use('/', routes);
-
 
 // Start the server
 app.listen(port, '0.0.0.0', () => {
