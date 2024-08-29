@@ -1,457 +1,256 @@
 const express = require('express');
 const router = express.Router();
 const sqlite3 = require('sqlite3').verbose();
+const { open } = require('sqlite');
 const moment = require('moment');
 
-const db = new sqlite3.Database('data/lastheard.db');
+let db;
 
-// Add a function to allow selecting countries
+(async () => {
+  db = await open({
+    filename: 'data/lastheard.db',
+    driver: sqlite3.Database
+  });
+})();
+
 function getCountry(country) {
   switch (country) {
-    case 'AT':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '232%' 
-      `;
-    case 'BE':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '206%' 
-      `;
-    case 'BG':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '284%' 
-      `;
-    case 'CH':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '228%' 
-      `;
-    case 'CY':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '280%' 
-      `;  
-    case 'CZ':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '255%' 
-      `;
-    case 'DE':
-      return `
-        (CAST(DestinationID AS TEXT) LIKE '262%' OR CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')
-      `;
-    case 'DK':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '238%' 
-      `;
-    case 'EE':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '248%' 
-      `;
-    case 'ES':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '214%' 
-      `;
-    case 'FI':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '244%' 
-      `;
-    case 'FR':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '208%'
-      `;
-    case 'GB':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '235%' 
-      `;
-    case 'GR':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '202%' 
-      `;
-    case 'HR':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '219%' 
-      `;
-    case 'HU':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '239%' 
-      `;
-    case 'IE':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '272%' 
-      `;
-    case 'IT':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '222%'
-      `;
-    case 'LT':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '246%' 
-      `;
-    case 'LU':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '270%' 
-      `;
-    case 'LV':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '247%' 
-      `;
-    case 'MT':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '278%' 
-      `;
-    case 'NL':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '204%'
-      `;
-    case 'PL':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '260%' 
-      `;
-    case 'PT':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '268%' 
-      `;
-    case 'RO':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '226%' 
-      `;
-    case 'SE':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '240%' 
-      `;
-    case 'SI':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '293%' 
-      `;
-    case 'SK':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '231%' 
-      `;
-    case 'UK':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '235%' 
-      `;
-    case 'All':
-      return `
-        CAST(DestinationID AS TEXT) LIKE '%' 
-      `;
-    default:
-      return `
-        CAST(DestinationID AS TEXT) LIKE '%' 
-      `;
+    case 'AT': return `CAST(DestinationID AS TEXT) LIKE '232%'`;
+    case 'BE': return `CAST(DestinationID AS TEXT) LIKE '206%'`;
+    case 'BG': return `CAST(DestinationID AS TEXT) LIKE '284%'`;
+    case 'CH': return `CAST(DestinationID AS TEXT) LIKE '228%'`;
+    case 'CY': return `CAST(DestinationID AS TEXT) LIKE '280%'`;
+    case 'CZ': return `CAST(DestinationID AS TEXT) LIKE '255%'`;
+    case 'DE': return `(CAST(DestinationID AS TEXT) LIKE '262%' OR CAST(DestinationID AS TEXT) LIKE '263%' OR CAST(DestinationID AS TEXT) LIKE '264%')`;
+    case 'DK': return `CAST(DestinationID AS TEXT) LIKE '238%'`;
+    case 'EE': return `CAST(DestinationID AS TEXT) LIKE '248%'`;
+    case 'ES': return `CAST(DestinationID AS TEXT) LIKE '214%'`;
+    case 'FI': return `CAST(DestinationID AS TEXT) LIKE '244%'`;
+    case 'FR': return `CAST(DestinationID AS TEXT) LIKE '208%'`;
+    case 'GB': return `CAST(DestinationID AS TEXT) LIKE '235%'`;
+    case 'GR': return `CAST(DestinationID AS TEXT) LIKE '202%'`;
+    case 'HR': return `CAST(DestinationID AS TEXT) LIKE '219%'`;
+    case 'HU': return `CAST(DestinationID AS TEXT) LIKE '239%'`;
+    case 'IE': return `CAST(DestinationID AS TEXT) LIKE '272%'`;
+    case 'IT': return `CAST(DestinationID AS TEXT) LIKE '222%'`;
+    case 'LT': return `CAST(DestinationID AS TEXT) LIKE '246%'`;
+    case 'LU': return `CAST(DestinationID AS TEXT) LIKE '270%'`;
+    case 'LV': return `CAST(DestinationID AS TEXT) LIKE '247%'`;
+    case 'MT': return `CAST(DestinationID AS TEXT) LIKE '278%'`;
+    case 'NL': return `CAST(DestinationID AS TEXT) LIKE '204%'`;
+    case 'PL': return `CAST(DestinationID AS TEXT) LIKE '260%'`;
+    case 'PT': return `CAST(DestinationID AS TEXT) LIKE '268%'`;
+    case 'RO': return `CAST(DestinationID AS TEXT) LIKE '226%'`;
+    case 'SE': return `CAST(DestinationID AS TEXT) LIKE '240%'`;
+    case 'SI': return `CAST(DestinationID AS TEXT) LIKE '293%'`;
+    case 'SK': return `CAST(DestinationID AS TEXT) LIKE '231%'`;
+    case 'UK': return `CAST(DestinationID AS TEXT) LIKE '235%'`;
+    case 'All': return `CAST(DestinationID AS TEXT) LIKE '%'`;
+    default: return `CAST(DestinationID AS TEXT) LIKE '%'`;
   }
 }
 
-// Adding function to permit querying by some time ranges: 
 function getTimeRange(range) {
   const now = moment();
   switch (range) {
-    case 'last-minute':
-      return [
-        moment().subtract(1, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-5-minutes':
-      return [
-        moment().subtract(5, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-15-minutes':
-      return [
-        moment().subtract(15, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-30-minutes':
-      return [
-        moment().subtract(30, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-hour':
-      return [
-        moment().subtract(1, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-6-hours':
-      return [
-        moment().subtract(6, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-      case 'last-12-hours':
-        return [
-          moment().subtract(12, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-          now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-        ];
-    case 'today':
-      return [
-        moment().startOf('day').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-24-hours':
-      return [
-        moment().subtract(24, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'this-week':
-      return [
-        moment().startOf('week').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'last-7-days':
-      return [
-        moment().subtract(7, 'days').toISOString().replace(/T/, ' ').replace(/\..+/, ''), 
-        now.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      ];
-    case 'all':
-      return [null, null];
-    default:
-      return [null, null];
+    case 'last-minute': return [moment().subtract(1, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-5-minutes': return [moment().subtract(5, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-15-minutes': return [moment().subtract(15, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-30-minutes': return [moment().subtract(30, 'minutes').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-hour': return [moment().subtract(1, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-6-hours': return [moment().subtract(6, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-12-hours': return [moment().subtract(12, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'today': return [moment().startOf('day').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-24-hours': return [moment().subtract(24, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'this-week': return [moment().startOf('week').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'last-7-days': return [moment().subtract(7, 'days').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
+    case 'all': return [null, null];
+    default: return [null, null];
   }
 }
 
-// Route to get the last 20 records from the database
-router.get('/lastheard', (req, res) => {
-  db.all('SELECT * FROM lastheard ORDER BY Timestamp DESC LIMIT 20', (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/lastheard', async (req, res) => {
+  try {
+    const rows = await db.all('SELECT * FROM lastheard ORDER BY Timestamp DESC LIMIT 20');
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the 20 most frequent DestinationName
-router.get('/top-destinations', (req, res) => {
-  db.all(`
-    SELECT DestinationName, DestinationID, COUNT(*) AS count 
-    FROM lastheard 
-    GROUP BY DestinationName 
-    ORDER BY count DESC 
-    LIMIT 20
-  `, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/top-destinations', async (req, res) => {
+  try {
+    const rows = await db.all(`
+      SELECT DestinationName, DestinationID, COUNT(*) AS count 
+      FROM lastheard 
+      GROUP BY DestinationName 
+      ORDER BY count DESC 
+      LIMIT 20
+    `);
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the count of records in the database
-router.get('/record-count', (req, res) => {
-  db.get('SELECT COUNT(*) AS count FROM lastheard', (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/record-count', async (req, res) => {
+  try {
+    const row = await db.get('SELECT COUNT(*) AS count FROM lastheard');
     res.json({ count: row.count });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the oldest record in the database
-router.get('/record-oldest', (req, res) => {
-  db.get('SELECT MIN(DATETIME(Timestamp)) AS oldest from lastheard', (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/record-oldest', async (req, res) => {
+  try {
+    const row = await db.get('SELECT MIN(DATETIME(Timestamp)) AS oldest from lastheard');
     res.json({ oldest: row.oldest });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the newest record in the database
-router.get('/record-newest', (req, res) => {
-  db.get('SELECT MAX(DATETIME(Timestamp)) AS newest from lastheard', (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/record-newest', async (req, res) => {
+  try {
+    const row = await db.get('SELECT MAX(DATETIME(Timestamp)) AS newest from lastheard');
     res.json({ newest: row.newest });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the count of records in the database filtered by time range
-router.get('/record-count-range', (req, res) => {
+router.get('/record-count-range', async (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  // console.log(range, start, end);
-  let query = `
-    SELECT COUNT(*) AS count FROM lastheard
-      `;
-  const params = [];
+  let query = `SELECT COUNT(*) AS count FROM lastheard`;
   if (start && end) {
-    // params.push(start, end);
-    query += `WHERE datetime(Timestamp) > DATETIME('${start}') 
-      AND datetime(Timestamp) < DATETIME('${end}')
-    `;
+    query += ` WHERE datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-  // console.log(query);
-  db.get(query, (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const row = await db.get(query);
     res.json({ count: row.count });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the count of records in the database filtered by time range and only EA
-router.get('/record-count-range-ea', (req, res) => {
+router.get('/record-count-range-ea', async (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  // console.log(range, start, end);
-  let query = `
-    SELECT COUNT(*) AS count FROM lastheard
-    WHERE CAST(DestinationID AS TEXT) LIKE '214%' 
-      `;
-  const params = [];
+  let query = `SELECT COUNT(*) AS count FROM lastheard WHERE CAST(DestinationID AS TEXT) LIKE '214%'`;
   if (start && end) {
-    // params.push(start, end);
-    query += `AND datetime(Timestamp) > DATETIME('${start}') 
-      AND datetime(Timestamp) < DATETIME('${end}')
-    `;
+    query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-  // console.log(query);
-  db.get(query, (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const row = await db.get(query);
     res.json({ count: row.count });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the count of records in the database filtered by time range and country
-router.get('/record-count-range-country', (req, res) => {
+router.get('/record-count-range-country', async (req, res) => {
   const { range, country } = req.query;
   const [start, end] = getTimeRange(range);
-  // console.log(range, country, start, end);
-  
-  let query = `
-    SELECT COUNT(*) AS count FROM lastheard
-    WHERE ${getCountry(country)}
-  `;
-  const params = [];
-  
+  let query = `SELECT COUNT(*) AS count FROM lastheard WHERE ${getCountry(country)}`;
   if (start && end) {
-    query += `AND datetime(Timestamp) > DATETIME('${start}') 
-              AND datetime(Timestamp) < DATETIME('${end}')
-    `;
+    query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-  
-  // console.log(query);
-  db.get(query, (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const row = await db.get(query);
     res.json({ count: row.count });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the 20 most frequent SourceCall
-router.get('/top-sourcecalls', (req, res) => {
-  db.all(`
-    SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
-    FROM lastheard 
-    WHERE SourceCall != ''
-    GROUP BY SourceCall, TalkerAlias 
-    ORDER BY count DESC 
-    LIMIT 20
-  `, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/top-sourcecalls', async (req, res) => {
+  try {
+    const rows = await db.all(`
+      SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
+      FROM lastheard 
+      WHERE SourceCall != ''
+      GROUP BY SourceCall, TalkerAlias 
+      ORDER BY count DESC 
+      LIMIT 20
+    `);
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the 20 most frequent DestinationID for spanish groups (starts with "21")
-router.get('/top-destinations-ea', (req, res) => {
-  db.all(`
-    SELECT DestinationName, DestinationID, COUNT(*) AS count 
-    FROM lastheard 
-    WHERE CAST(DestinationID AS TEXT) LIKE '214%' 
-    GROUP BY DestinationName, DestinationID 
-    ORDER BY count DESC 
-    LIMIT 20
-  `, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/top-destinations-ea', async (req, res) => {
+  try {
+    const rows = await db.all(`
+      SELECT DestinationName, DestinationID, COUNT(*) AS count 
+      FROM lastheard 
+      WHERE CAST(DestinationID AS TEXT) LIKE '214%' 
+      GROUP BY DestinationName, DestinationID 
+      ORDER BY count DESC 
+      LIMIT 20
+    `);
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the 20 most frequent DestinationID filtered by time range and country
-router.get('/top-destination-range-country', (req, res) => {
+router.get('/top-destination-range-country', async (req, res) => {
   const { range, country } = req.query;
   const [start, end] = getTimeRange(range);
-  // console.log(range, country, start, end);
-  
   let query = `
     SELECT DestinationName, DestinationID, COUNT(*) AS count, sum(Duration) as totalDuration 
     FROM lastheard 
-    WHERE SourceCall != ''
-      AND ${getCountry(country)}
+    WHERE SourceCall != '' AND ${getCountry(country)}
   `;
-  const params = [];
-  
   if (start && end) {
-    query += `AND datetime(Timestamp) > DATETIME('${start}') 
-              AND datetime(Timestamp) < DATETIME('${end}')
-    `;
+    query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-
-  query += `GROUP BY DestinationName 
-            ORDER BY count DESC 
-            LIMIT 20`;
-  // console.log(query);
-  db.all(query, params, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  query += ` GROUP BY DestinationName ORDER BY count DESC LIMIT 20`;
+  try {
+    const rows = await db.all(query);
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-
-// Route to get the 20 most frequent SourceCall EA (Spain)
-router.get('/top-sourcecallsEA', (req, res) => {
-  db.all(`
-    SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
-    FROM lastheard 
-    WHERE SourceCall != '' and
-      CAST(SourceID AS TEXT) LIKE '214%' 
-    GROUP BY SourceCall, TalkerAlias 
-    ORDER BY count DESC 
-    LIMIT 20
-  `, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get('/top-sourcecallsEA', async (req, res) => {
+  try {
+    const rows = await db.all(`
+      SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
+      FROM lastheard 
+      WHERE SourceCall != '' and CAST(SourceID AS TEXT) LIKE '214%' 
+      GROUP BY SourceCall, TalkerAlias 
+      ORDER BY count DESC 
+      LIMIT 20
+    `);
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Route to get the 20 most frequent SourceID filtered by time range for spanish groups (starts with "21")
-router.get('/top-sourcecalls-rangeEA', (req, res) => {
+router.get('/top-sourcecalls-rangeEA', async (req, res) => {
   const { range } = req.query;
   const [start, end] = getTimeRange(range);
-  // console.log(range, start, end);
   let query = `
     SELECT SourceCall, SourceID, TalkerAlias, COUNT(*) AS count
     FROM lastheard 
-    WHERE SourceCall != ''
-      AND CAST(SourceID AS TEXT) LIKE '214%'
-      `;
-  const params = [];
-  
+    WHERE SourceCall != '' AND CAST(SourceID AS TEXT) LIKE '214%'
+  `;
   if (start && end) {
-    // params.push(start, end);
-    query += `AND datetime(Timestamp) > DATETIME('${start}') 
-      AND datetime(Timestamp) < DATETIME('${end}')
-    `;
+    query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-
-  query += `GROUP BY SourceCall, TalkerAlias 
-    ORDER BY count DESC 
-    LIMIT 20`;
-  // console.log(query);
-  db.all(query, params, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  query += ` GROUP BY SourceCall, TalkerAlias ORDER BY count DESC LIMIT 20`;
+  try {
+    const rows = await db.all(query);
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-  
+
 module.exports = router;
