@@ -3,62 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Dashboard - Pie Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 20px;
-    }
-    table {
-      width: 100%;
-      margin: 0 auto;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid black;
-      padding: 8px;
-      text-align: left;
-      word-wrap: break-word;
-    }
-    th {
-      background-color: #f2f2f2;
+      margin-top: 50px;
     }
     .filter-container {
       margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
     .filter-container select {
-      padding: 10px;
-      margin: 5px 0;
-      width: 80%;
-      max-width: 300px;
+      padding: 5px;
+      margin: 0 10px;
     }
-    h2 {
-      font-size: 1.5em;
-    }
-    @media (min-width: 600px) {
-      .filter-container {
-        flex-direction: row;
-        justify-content: center;
-      }
-      .filter-container select {
-        width: auto;
-        margin: 0 10px;
-      }
+    canvas {
+      max-width: 600px;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
-  <h1>Dashboard</h1>
+  <h1>Dashboard - Pie Chart</h1>
   <div class="filter-container">
     <label for="time-range">Time Range:</label>
     <select id="time-range" onchange="fetchDashboardData()">
-      <option value="last-minute" selected>Last Minute</option>
-      <option value="last-5-minutes">Last 5 Minutes</option>
-      <option value="last-15-minutes" selected>Last 15 Minutes</option>
+      <option value="last-15-minutes">Last 15 Minutes</option>
       <option value="last-30-minutes">Last 30 Minutes</option>
       <option value="last-hour">Last Hour</option>
       <option value="last-6-hours">Last 6 Hours</option>
@@ -103,24 +74,11 @@
     </select>
   </div>
   <h2>Total Record Count: <span id="record-count">Loading...</span></h2>
-  <h2 id="country-title">Top 20 Destination TGs for EA (Spain)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>TG Number</th>
-        <th>TG Name</th>
-        <th>Count</th>
-        <th>Percentage</th>
-        <th>Total QSO Duration</th>
-      </tr>
-    </thead>
-    <tbody id="top-DestinationIDs">
-      <!-- Data will be inserted here -->
-    </tbody>
-  </table>
-  <p id="query-time" style="font-weight: bold;">Query Time: <span id="time-taken">0</span> ms</p>
+  <canvas id="myPieChart"></canvas>
 
   <script>
+    let myPieChart;
+
     async function fetchDashboardData() {
       const timeRange = document.getElementById('time-range').value;
       const country = document.getElementById('country-selector').value;
@@ -129,42 +87,61 @@
       queryParams.append('range', timeRange);
       queryParams.append('country', country);
 
-      const startTime = performance.now(); // Start time measurement
-
       try {
-        const [recordCountResponse, topDestinationIDsResponse] = await Promise.all([
-          fetch(`/record-count-range-country?${queryParams.toString()}`),
-          fetch(`/top-destination-range-country?${queryParams.toString()}`)
-        ]);
+        const response = await fetch(`/top-destination-range-country?${queryParams.toString()}`);
+        const topDestinationIDsData = await response.json();
 
+        const recordCountResponse = await fetch(`/record-count-range-country?${queryParams.toString()}`);
         const recordCountData = await recordCountResponse.json();
-        const topDestinationIDsData = await topDestinationIDsResponse.json();
-
         document.getElementById('record-count').textContent = recordCountData.count;
 
-        const topDestinationIDsTable = document.getElementById('top-DestinationIDs');
-        topDestinationIDsTable.innerHTML = '';
+        const labels = topDestinationIDsData.map(DestinationID => `${DestinationID.DestinationName} (${DestinationID.DestinationID})`);
+        const data = topDestinationIDsData.map(DestinationID => DestinationID.count);
+        const totalCount = recordCountData.count;
+        const percentages = data.map(count => ((count / totalCount) * 100).toFixed(2));
 
-        topDestinationIDsData.forEach(DestinationID => {
-          const percentage = ((DestinationID.count / recordCountData.count) * 100).toFixed(2);
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${DestinationID.DestinationID}</td>
-            <td>${DestinationID.DestinationName}</td>
-            <td>${DestinationID.count}</td>
-            <td>${percentage}%</td>
-            <td>${DestinationID.totalDuration} sec.</td>
-          `;
-          topDestinationIDsTable.appendChild(row);
+        const ctx = document.getElementById('myPieChart').getContext('2d');
+
+        if (myPieChart) {
+          myPieChart.destroy(); // Destroy the previous chart instance
+        }
+
+        myPieChart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)',
+              ],
+              borderColor: 'rgba(255, 255, 255, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(tooltipItem) {
+                    const percentage = percentages[tooltipItem.dataIndex];
+                    return `${tooltipItem.label}: ${percentage}%`;
+                  }
+                }
+              }
+            }
+          }
         });
-
-        // Update the country title
-        document.getElementById('country-title').textContent = `Top 20 Destination TGs for ${country}`;
-
-        const endTime = performance.now(); // End time measurement
-        const timeTaken = (endTime - startTime).toFixed(2); // Calculate time taken
-        document.getElementById('time-taken').textContent = timeTaken; // Output time taken
-
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       }
@@ -173,7 +150,7 @@
     // Fetch dashboard data on page load
     fetchDashboardData();
 
-    // Refresh the page every 5 seconds
+    // Refresh the data every 5 seconds
     setInterval(fetchDashboardData, 5000);
   </script>
 </body>
