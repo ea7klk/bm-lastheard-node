@@ -128,7 +128,7 @@ socket.on('mqtt', (data) => {
       // Increment the insert counter
       insertCounter++;
 
-      if (insertCounter >= 10000) {
+      if (insertCounter >= 2000) {
         const query =`BEGIN TRANSACTION;
         INSERT INTO lhhistory
         SELECT *
