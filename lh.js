@@ -27,19 +27,17 @@ const db = new sqlite3.Database('data/lastheard.db');
 
 // Step 4: Create a table if it doesn't exist
 db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS lastheard (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
   db.run(`CREATE TABLE IF NOT EXISTS lhhistory (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    LinkName TEXT, SessionID TEXT, Route TEXT, LinkCall TEXT, SourceCall TEXT, 
-    SourceName TEXT, SourceID REAL, ContextID REAL, LinkType REAL, 
-    DestinationCall TEXT, Stop REAL, RSSI TEXT, BER REAL, ReflectorID REAL, 
-    LinkTypeName TEXT, DestinationID REAL, LossCount REAL, TotalCount REAL, 
-    Master REAL, TalkerAlias TEXT, State REAL, Start REAL, Duration REAL, 
-    FlagSet REAL, Event TEXT, DestinationName TEXT, CallTypes TEXT, Slot REAL, SessionType REAL
-    );`);  
+    ID INTEGER PRIMARY KEY ,
+    Timestamp DATETIME , LinkName TEXT, Slot REAL, SourceID REAL, 
+    DestinationID REAL, Route TEXT, LinkCall TEXT, SessionType REAL, 
+    SourceName TEXT, DestinationCall TEXT, DestinationName TEXT, 
+    State REAL, Start REAL, Stop REAL, RSSI TEXT, BER REAL, 
+    ReflectorID REAL, LinkType REAL, CallTypes TEXT, 
+    LossCount REAL, TotalCount REAL, Master REAL, 
+    TalkerAlias TEXT, FlagSet REAL, Event TEXT, LinkTypeName TEXT, 
+    ContextID REAL, SessionID TEXT, SourceCall TEXT, Duration REAL);`
+  );  
 });
 
 // Insert counter
@@ -135,9 +133,9 @@ socket.on('mqtt', (data) => {
         INSERT INTO lhhistory
         SELECT *
         FROM lastheard
-        WHERE timestamp < datetime('now', '-48 hours');
+        WHERE timestamp < datetime('now', '-24 hours');
         DELETE FROM lastheard
-        WHERE timestamp < datetime('now', '-48 hours');
+        WHERE timestamp < datetime('now', '-24 hours');
         COMMIT;`;
         db.exec(query, (err) => {  
           if (err) {
