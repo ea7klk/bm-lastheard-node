@@ -130,14 +130,14 @@ socket.on('mqtt', (data) => {
       // Increment the insert counter
       insertCounter++;
 
-      if (insertCounter >= 10000) {
+      if (insertCounter >= 2000) {
         const query =`BEGIN TRANSACTION;
         INSERT INTO lhhistory
         SELECT *
         FROM lastheard
-        WHERE timestamp < datetime('now', '-48 hours');
+        WHERE timestamp < datetime('now', '-24 hours');
         DELETE FROM lastheard
-        WHERE timestamp < datetime('now', '-48 hours');
+        WHERE timestamp < datetime('now', '-24 hours');
         COMMIT;`;
         db.exec(query, (err) => {  
           if (err) {
