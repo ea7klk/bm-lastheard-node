@@ -31,7 +31,19 @@ db.serialize(() => {
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
+  db.run(`CREATE TABLE IF NOT EXISTS lhhistory (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    LinkName TEXT, SessionID TEXT, Route TEXT, LinkCall TEXT, SourceCall TEXT, 
+    SourceName TEXT, SourceID REAL, ContextID REAL, LinkType REAL, 
+    DestinationCall TEXT, Stop REAL, RSSI TEXT, BER REAL, ReflectorID REAL, 
+    LinkTypeName TEXT, DestinationID REAL, LossCount REAL, TotalCount REAL, 
+    Master REAL, TalkerAlias TEXT, State REAL, Start REAL, Duration REAL, 
+    FlagSet REAL, Event TEXT, DestinationName TEXT, CallTypes TEXT, Slot REAL, SessionType REAL
+    );`);  
 });
+
+// Insert counter
+let insertCounter = 0;
 
 // Step 5: Listen for "mqtt" events
 socket.on('mqtt', (data) => {
@@ -114,6 +126,35 @@ socket.on('mqtt', (data) => {
         return console.error('Error inserting data:', err.message);
       }
       console.log(`A row has been inserted with rowid ${this.lastID}`);
+
+      // Increment the insert counter
+      insertCounter++;
+
+      if (insertCounter >= 10000) {
+        const query =`BEGIN TRANSACTION;
+        INSERT INTO lhhistory
+        SELECT *
+        FROM lastheard
+        WHERE timestamp < datetime('now', '-48 hours');
+        DELETE FROM lastheard
+        WHERE timestamp < datetime('now', '-48 hours');
+        COMMIT;`;
+        db.exec(query, (err) => {  
+          if (err) {
+            console.error('Error running housekeeping:', err.message);
+          } else {
+            console.log('Housekeeping completed successfully.');
+            db.run('VACUUM; ANALYZE;', (err) => {
+              if (err) {
+                  console.error('Error running VACUUM:', err.message);
+              } else {
+                  console.log('VACUUM and ANALYZE completed successfully.');
+                  insertCounter = 0; // Reset the counter after successful housekeeping
+              }
+          });
+        }
+       });
+      }
     });
   });
 });
