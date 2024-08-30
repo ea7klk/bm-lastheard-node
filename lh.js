@@ -68,8 +68,8 @@ socket.on('mqtt', (data) => {
   const duration = lastheard.Stop - lastheard.Start;
   lastheard["Duration"] = duration;
 
-  // Check if lastheard.Duration is < 2 (Avoid kerchunks)
-  if (lastheard.Duration < 2) {
+  // Check if lastheard.Duration is < 5 (Avoid kerchunks)
+  if (lastheard.Duration < 5) {
     return; 
   }
 
