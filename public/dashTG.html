@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+      word-wrap: break-word;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .filter-container {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .filter-container select {
+      padding: 10px;
+      margin: 5px 0;
+      width: 80%;
+      max-width: 300px;
+    }
+    h2 {
+      font-size: 1.5em;
+    }
+    @media (min-width: 600px) {
+      .filter-container {
+        flex-direction: row;
+        justify-content: center;
+      }
+      .filter-container select {
+        width: auto;
+        margin: 0 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <div class="filter-container">
+    <label for="time-range">Time Range:</label>
+    <select id="time-range" onchange="fetchDashboardData()">
+      <option value="last-minute" selected>Last Minute</option>
+      <option value="last-5-minutes">Last 5 Minutes</option>
+      <option value="last-15-minutes" selected>Last 15 Minutes</option>
+      <option value="last-30-minutes">Last 30 Minutes</option>
+      <option value="last-hour">Last Hour</option>
+      <option value="last-6-hours">Last 6 Hours</option>
+      <option value="last-12-hours">Last 12 Hours</option>
+      <option value="today">Today</option>
+      <option value="last-24-hours">Last 24 Hours</option>
+      <option value="last-2-days">Last 2 days</option>
+      <option value="all">All</option>
+    </select>
+    <label for="country-selector">Select Country:</label>
+    <select id="country-selector" onchange="fetchDashboardData()">
+        <option value="All" selected> All</option>
+        <option value="AT">Austria</option>
+        <option value="BE">Belgium</option>
+        <option value="BG">Bulgaria</option>
+        <option value="CY">Cyprus</option>
+        <option value="CZ">Czech Republic</option>
+        <option value="DE">Germany</option>
+        <option value="DK">Denmark</option>
+        <option value="EE">Estonia</option>
+        <option value="ES">Spain</option>
+        <option value="FI">Finland</option>
+        <option value="FR">France</option>        
+        <option value="GR">Greece</option>
+        <option value="HR">Croatia</option>
+        <option value="HU">Hungary</option>
+        <option value="IE">Ireland</option>
+        <option value="IT">Italy</option>
+        <option value="LT">Lithuania</option>
+        <option value="LU">Luxembourg</option>
+        <option value="LV">Latvia</option>
+        <option value="MT">Malta</option>
+        <option value="NL">Netherlands</option>
+        <option value="PL">Poland</option>
+        <option value="PT">Portugal</option>
+        <option value="RO">Romania</option>
+        <option value="SE">Sweden</option>
+        <option value="SI">Slovenia</option>
+        <option value="SK">Slovakia</option>
+        <option value="UK">United Kingdom</option>
+    </select>
+  </div>
+  <h2>Total Record Count: <span id="record-count">Loading...</span></h2>
+  <h2 id="country-title">Top 20 Destination TGs for EA (Spain)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>TG Number</th>
+        <th>TG Name</th>
+        <th>Count</th>
+        <th>Percentage</th>
+        <th>Total QSO Duration</th>
+      </tr>
+    </thead>
+    <tbody id="top-DestinationIDs">
+      <!-- Data will be inserted here -->
+    </tbody>
+  </table>
+  <p id="query-time" style="font-weight: bold;">Query Time: <span id="time-taken">0</span> ms</p>
+
+  <script>
+    async function fetchDashboardData() {
+      const timeRange = document.getElementById('time-range').value;
+      const country = document.getElementById('country-selector').value;
+
+      const queryParams = new URLSearchParams();
+      queryParams.append('range', timeRange);
+      queryParams.append('country', country);
+
+      const startTime = performance.now(); // Start time measurement
+
+      try {
+        const [recordCountResponse, topDestinationIDsResponse] = await Promise.all([
+          fetch(`/record-count-range-country?${queryParams.toString()}`),
+          fetch(`/top-destination-range-country?${queryParams.toString()}`)
+        ]);
+
+        const recordCountData = await recordCountResponse.json();
+        const topDestinationIDsData = await topDestinationIDsResponse.json();
+
+        document.getElementById('record-count').textContent = recordCountData.count;
+
+        const topDestinationIDsTable = document.getElementById('top-DestinationIDs');
+        topDestinationIDsTable.innerHTML = '';
+
+        topDestinationIDsData.forEach(DestinationID => {
+          const percentage = ((DestinationID.count / recordCountData.count) * 100).toFixed(2);
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${DestinationID.DestinationID}</td>
+            <td>${DestinationID.DestinationName}</td>
+            <td>${DestinationID.count}</td>
+            <td>${percentage}%</td>
+            <td>${DestinationID.totalDuration} sec.</td>
+          `;
+          topDestinationIDsTable.appendChild(row);
+        });
+
+        // Update the country title
+        document.getElementById('country-title').textContent = `Top 20 Destination TGs for ${country}`;
+
+        const endTime = performance.now(); // End time measurement
+        const timeTaken = (endTime - startTime).toFixed(2); // Calculate time taken
+        document.getElementById('time-taken').textContent = timeTaken; // Output time taken
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      }
+    }
+
+    // Fetch dashboard data on page load
+    fetchDashboardData();
+
+    // Refresh the page every 5 seconds
+    setInterval(fetchDashboardData, 5000);
+  </script>
+</body>
+<footer>
+  <p>
+      This website is provided by Volker Kerkhoff, 41089 Dos Hermanas (Spain). We do not use cookies, neither own or third-party. This application does not track you and does not use any personal data that isn't already publicly available. The complete source code is available on <a href="https://github.com/ea7klk/bm-lastheard-node" target="_blank">GitHub</a> and is under Creative Commons license. Please contact me via GitHub issues or volker at ea7klk . es
+  </p>
+</footer>
+</html>
