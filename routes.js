@@ -141,4 +141,24 @@ router.get('/top-destination-range-country', async (req, res) => {
   }
 });
 
+router.get('/top-call-range-country', async (req, res) => {
+  const { range, country } = req.query;
+  const [start, end] = getTimeRange(range);
+  let query = `
+    SELECT SourceID, SourceCall, SourceName, COUNT(*) AS count, sum(Duration) as totalDuration 
+    FROM lastheard 
+    WHERE SourceCall != '' AND ${getCountry(country)}
+  `;
+  if (start && end) {
+    query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
+  }
+  query += ` GROUP BY SourceID ORDER BY count DESC LIMIT 25`;
+  try {
+    const rows = await db.all(query);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
