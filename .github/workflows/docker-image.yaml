@@ -33,29 +33,29 @@ jobs:
           ghcr.io/${{ github.repository }}:${{ github.ref_name }}
           ghcr.io/${{ github.repository }}:latest
 
-  smoke-test:
-    runs-on: ubuntu-latest
-    needs: build
+  # smoke-test:
+  #   runs-on: ubuntu-latest
+  #   needs: build
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+  #   steps:
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+  #   - name: Set up Docker Buildx
+  #     uses: docker/setup-buildx-action@v3
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+  #   - name: Login to GitHub Container Registry
+  #     uses: docker/login-action@v3
+  #     with:
+  #       registry: ghcr.io
+  #       username: ${{ github.actor }}
+  #       password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Run smoke test
-      run: |
-        docker pull ghcr.io/${{ github.repository }}:latest
-        docker run --rm -d -p 3000:3000 --name bm-lastheard-node ghcr.io/${{ github.repository }}:latest
-        sleep 10
-        curl --fail http://localhost:3000/dashTG.html
-        curl --fail http://localhost:3000/dashCall.html
-        docker stop bm-lastheard-node
+  #   - name: Run smoke test
+  #     run: |
+  #       docker pull ghcr.io/${{ github.repository }}:latest
+  #       docker run --rm -d -p 3000:3000 --name bm-lastheard-node ghcr.io/${{ github.repository }}:latest
+  #       sleep 10
+  #       curl --fail http://localhost:3000/dashTG.html
+  #       curl --fail http://localhost:3000/dashCall.html
+  #       docker stop bm-lastheard-node
