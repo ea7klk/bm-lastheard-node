@@ -18,8 +18,15 @@
   <p id="record-oldest">Loading...</p>
   <p id="record-newest">Loading...</p>
 
+  <h1>Number of Records in the history Table</h1>
+  <p id="record-count-history">Loading...</p>
+  <p id="record-oldest-history">Loading...</p>
+  <p id="record-newest-history">Loading...</p>
+  <p id="query-time" style="font-weight: bold;">Query Time: <span id="time-taken">0</span> ms</p>
+
   <script>
     async function fetchRecordCount() {
+      const startTime = performance.now(); // Start time measurement
       try {
         const count = await fetch('/record-count');
         const countData = await count.json();
@@ -27,15 +34,27 @@
         const oldestData = await oldest.json();
         const newest = await fetch('/record-newest');
         const newestData = await newest.json();
+        const countHistory = await fetch('/record-count-history');
+        const countDataHistory = await countHistory.json();
+        const oldestHistory = await fetch('/record-oldest-history');
+        const oldestDataHistory = await oldestHistory.json();
+        const newestHistory = await fetch('/record-newest-history');
+        const newestDataHistory = await newestHistory.json();
         console.log(countData);
 
         document.getElementById('record-count').textContent = `There are ${countData.count} records currently in the LastHeard table`;
         document.getElementById('record-oldest').textContent = `The oldest record in the database is dated ${oldestData.oldest} UTC`;
         document.getElementById('record-newest').textContent = `The newest record in the database is dated ${newestData.newest} UTC`;
+        document.getElementById('record-count-history').textContent = `There are ${countDataHistory.count} records currently in the history table`;
+        document.getElementById('record-oldest-history').textContent = `The oldest record in the database is dated ${oldestDataHistory.oldest} UTC`;
+        document.getElementById('record-newest-history').textContent = `The newest record in the database is dated ${newestDataHistory.newest} UTC`;
       } catch (error) {
         console.error('Error fetching record count:', error);
         document.getElementById('record-count').textContent = 'Error loading data';
       }
+      const endTime = performance.now(); // End time measurement
+      const timeTaken = (endTime - startTime).toFixed(2); // Calculate time taken
+      document.getElementById('time-taken').textContent = timeTaken; // Output time taken
     }
 
     async function fetchRecordOldest() {
