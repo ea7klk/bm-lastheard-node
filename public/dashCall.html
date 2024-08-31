@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Most active Brandmeister callsigns</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -106,14 +106,15 @@
   <table>
     <thead>
       <tr>
-        <th>TG Number</th>
-        <th>TG Name</th>
-        <th>Count</th>
+        <th>DMR ID</th>
+        <th>Callsign</th>
+        <th>Name</th>
+        <th>QSO Count</th>
         <th>Percentage</th>
         <th>Total QSO Duration</th>
       </tr>
     </thead>
-    <tbody id="top-DestinationIDs">
+    <tbody id="top-Call">
       <!-- Data will be inserted here -->
     </tbody>
   </table>
@@ -131,34 +132,35 @@
       const startTime = performance.now(); // Start time measurement
 
       try {
-        const [recordCountResponse, topDestinationIDsResponse] = await Promise.all([
+        const [recordCountResponse, topCallResponse] = await Promise.all([
           fetch(`/record-count-range-country?${queryParams.toString()}`),
-          fetch(`/top-destination-range-country?${queryParams.toString()}`)
+          fetch(`/top-call-range-country?${queryParams.toString()}`)
         ]);
 
         const recordCountData = await recordCountResponse.json();
-        const topDestinationIDsData = await topDestinationIDsResponse.json();
+        const topCallData = await topCallResponse.json();
 
         document.getElementById('record-count').textContent = recordCountData.count;
 
-        const topDestinationIDsTable = document.getElementById('top-DestinationIDs');
-        topDestinationIDsTable.innerHTML = '';
+        const topCallTable = document.getElementById('top-Call');
+        topCallTable.innerHTML = '';
 
-        topDestinationIDsData.forEach(DestinationID => {
-          const percentage = ((DestinationID.count / recordCountData.count) * 100).toFixed(2);
+        topCallData.forEach(Call => {
+          const percentage = ((Call.count / recordCountData.count) * 100).toFixed(2);
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${DestinationID.DestinationID}</td>
-            <td>${DestinationID.DestinationName}</td>
-            <td>${DestinationID.count}</td>
+            <td>${Call.SourceID}</td>
+            <td>${Call.SourceCall}</td>
+            <td>${Call.SourceName}</td>
+            <td>${Call.count}</td>
             <td>${percentage}%</td>
-            <td>${DestinationID.totalDuration} sec.</td>
+            <td>${Call.totalDuration} sec.</td>
           `;
-          topDestinationIDsTable.appendChild(row);
+          topCallTable.appendChild(row);
         });
 
         // Update the country title
-        document.getElementById('country-title').textContent = `Top 20 Destination TGs for ${country}`;
+        document.getElementById('country-title').textContent = `Top 25 active callsigns for ${country}`;
 
         const endTime = performance.now(); // End time measurement
         const timeTaken = (endTime - startTime).toFixed(2); // Calculate time taken
@@ -176,4 +178,9 @@
     setInterval(fetchDashboardData, 5000);
   </script>
 </body>
+<footer>
+  <p>
+      This website is provided by Volker Kerkhoff, 41089 Dos Hermanas (Spain). We do not use cookies, neither own or third-party. This application does not track you and does not use any personal data that isn't already publicly available. The complete source code is available on <a href="https://github.com/ea7klk/bm-lastheard-node" target="_blank">GitHub</a> and is under Creative Commons license. Please contact me via GitHub issues or volker at ea7klk . es
+  </p>
+</footer>
 </html>

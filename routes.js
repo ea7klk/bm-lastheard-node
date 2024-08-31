@@ -77,21 +77,6 @@ router.get('/lastheard', async (req, res) => {
   }
 });
 
-router.get('/top-destinations', async (req, res) => {
-  try {
-    const rows = await db.all(`
-      SELECT DestinationName, DestinationID, COUNT(*) AS count 
-      FROM lastheard 
-      GROUP BY DestinationName 
-      ORDER BY count DESC 
-      LIMIT 20
-    `);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 router.get('/record-count', async (req, res) => {
   try {
     const row = await db.get('SELECT COUNT(*) AS count FROM lastheard');
@@ -119,35 +104,6 @@ router.get('/record-newest', async (req, res) => {
   }
 });
 
-router.get('/record-count-range', async (req, res) => {
-  const { range } = req.query;
-  const [start, end] = getTimeRange(range);
-  let query = `SELECT COUNT(*) AS count FROM lastheard`;
-  if (start && end) {
-    query += ` WHERE datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
-  }
-  try {
-    const row = await db.get(query);
-    res.json({ count: row.count });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.get('/record-count-range-ea', async (req, res) => {
-  const { range } = req.query;
-  const [start, end] = getTimeRange(range);
-  let query = `SELECT COUNT(*) AS count FROM lastheard WHERE CAST(DestinationID AS TEXT) LIKE '214%'`;
-  if (start && end) {
-    query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
-  }
-  try {
-    const row = await db.get(query);
-    res.json({ count: row.count });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 router.get('/record-count-range-country', async (req, res) => {
   const { range, country } = req.query;
@@ -164,37 +120,6 @@ router.get('/record-count-range-country', async (req, res) => {
   }
 });
 
-router.get('/top-sourcecalls', async (req, res) => {
-  try {
-    const rows = await db.all(`
-      SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
-      FROM lastheard 
-      WHERE SourceCall != ''
-      GROUP BY SourceCall, TalkerAlias 
-      ORDER BY count DESC 
-      LIMIT 20
-    `);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.get('/top-destinations-ea', async (req, res) => {
-  try {
-    const rows = await db.all(`
-      SELECT DestinationName, DestinationID, COUNT(*) AS count 
-      FROM lastheard 
-      WHERE CAST(DestinationID AS TEXT) LIKE '214%' 
-      GROUP BY DestinationName, DestinationID 
-      ORDER BY count DESC 
-      LIMIT 20
-    `);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 router.get('/top-destination-range-country', async (req, res) => {
   const { range, country } = req.query;
@@ -207,7 +132,7 @@ router.get('/top-destination-range-country', async (req, res) => {
   if (start && end) {
     query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-  query += ` GROUP BY DestinationName ORDER BY count DESC LIMIT 20`;
+  query += ` GROUP BY DestinationName ORDER BY count DESC LIMIT 25`;
   try {
     const rows = await db.all(query);
     res.json(rows);
@@ -216,34 +141,18 @@ router.get('/top-destination-range-country', async (req, res) => {
   }
 });
 
-router.get('/top-sourcecallsEA', async (req, res) => {
-  try {
-    const rows = await db.all(`
-      SELECT SourceCall, TalkerAlias, COUNT(*) AS count 
-      FROM lastheard 
-      WHERE SourceCall != '' and CAST(SourceID AS TEXT) LIKE '214%' 
-      GROUP BY SourceCall, TalkerAlias 
-      ORDER BY count DESC 
-      LIMIT 20
-    `);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.get('/top-sourcecalls-rangeEA', async (req, res) => {
-  const { range } = req.query;
+router.get('/top-call-range-country', async (req, res) => {
+  const { range, country } = req.query;
   const [start, end] = getTimeRange(range);
   let query = `
-    SELECT SourceCall, SourceID, TalkerAlias, COUNT(*) AS count
+    SELECT SourceID, SourceCall, SourceName, COUNT(*) AS count, sum(Duration) as totalDuration 
     FROM lastheard 
-    WHERE SourceCall != '' AND CAST(SourceID AS TEXT) LIKE '214%'
+    WHERE SourceCall != '' AND ${getCountry(country)}
   `;
   if (start && end) {
     query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-  query += ` GROUP BY SourceCall, TalkerAlias ORDER BY count DESC LIMIT 20`;
+  query += ` GROUP BY SourceID ORDER BY count DESC LIMIT 25`;
   try {
     const rows = await db.all(query);
     res.json(rows);
