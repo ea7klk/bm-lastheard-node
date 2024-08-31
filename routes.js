@@ -132,7 +132,7 @@ router.get('/top-destination-range-country', async (req, res) => {
   if (start && end) {
     query += ` AND datetime(Timestamp) > DATETIME('${start}') AND datetime(Timestamp) < DATETIME('${end}')`;
   }
-  query += ` GROUP BY DestinationName ORDER BY count DESC LIMIT 20`;
+  query += ` GROUP BY DestinationName ORDER BY count DESC LIMIT 25`;
   try {
     const rows = await db.all(query);
     res.json(rows);
