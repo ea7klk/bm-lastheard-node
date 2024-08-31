@@ -104,6 +104,33 @@ router.get('/record-newest', async (req, res) => {
   }
 });
 
+router.get('/record-count-history', async (req, res) => {
+  try {
+    const row = await db.get('SELECT COUNT(*) AS count FROM lhhistory');
+    res.json({ count: row.count });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/record-oldest-history', async (req, res) => {
+  try {
+    const row = await db.get('SELECT MIN(DATETIME(Timestamp)) AS oldest from lhhistory');
+    res.json({ oldest: row.oldest });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/record-newest-history', async (req, res) => {
+  try {
+    const row = await db.get('SELECT MAX(DATETIME(Timestamp)) AS newest from lhhistory');
+    res.json({ newest: row.newest });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 router.get('/record-count-range-country', async (req, res) => {
   const { range, country } = req.query;
