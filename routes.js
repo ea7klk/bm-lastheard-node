@@ -62,7 +62,6 @@ function getTimeRange(range) {
     case 'last-12-hours': return [moment().subtract(12, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
     case 'today': return [moment().startOf('day').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
     case 'last-24-hours': return [moment().subtract(24, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
-    case 'last-2-days': return [moment().subtract(48, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
     case 'all': return [null, null];
     default: return [null, null];
   }
