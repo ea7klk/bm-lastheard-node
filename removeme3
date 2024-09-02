@@ -1,6 +1,0 @@
-fetch('/lastheard');
-fetch('/record-count');
-fetch('/record-newest');
-fetch('/record-oldest');
-fetch(`/record-count-range-country?${queryParams.toString()}`),
-fetch(`/top-destination-range-country?${queryParams.toString()}`)

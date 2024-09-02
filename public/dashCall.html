@@ -80,7 +80,6 @@
       <option value="last-12-hours">Last 12 Hours</option>
       <option value="today">Today</option>
       <option value="last-24-hours">Last 24 Hours</option>
-      <option value="last-2-days">Last 2 days</option>
       <option value="all">All</option>
     </select>
     <label for="country-selector">Select Country:</label>
@@ -189,8 +188,8 @@
     // Fetch dashboard data on page load
     fetchDashboardData();
 
-    // Refresh the page every 5 seconds
-    setInterval(fetchDashboardData, 5000);
+    // Refresh the page every 10 seconds
+    setInterval(fetchDashboardData, 10000);
   </script>
 </body>
 <footer>

@@ -3,6 +3,7 @@ const router = express.Router();
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const moment = require('moment');
+const https = require('https')
 
 let db;
 
@@ -62,7 +63,6 @@ function getTimeRange(range) {
     case 'last-12-hours': return [moment().subtract(12, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
     case 'today': return [moment().startOf('day').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
     case 'last-24-hours': return [moment().subtract(24, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
-    case 'last-2-days': return [moment().subtract(48, 'hours').toISOString().replace(/T/, ' ').replace(/\..+/, ''), now.toISOString().replace(/T/, ' ').replace(/\..+/, '')];
     case 'all': return [null, null];
     default: return [null, null];
   }
@@ -72,6 +72,8 @@ router.get('/lastheard', async (req, res) => {
   try {
     const rows = await db.all('SELECT * FROM lastheard ORDER BY Timestamp DESC LIMIT 20');
     res.json(rows);
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=lastheard&lastheard&e_c=API&e_a=get&e_n=lastheard', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -81,6 +83,8 @@ router.get('/record-count', async (req, res) => {
   try {
     const row = await db.get('SELECT COUNT(*) AS count FROM lastheard');
     res.json({ count: row.count });
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=record-count&url=record-count&e_c=API&e_a=get&e_n=count', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -90,6 +94,8 @@ router.get('/record-oldest', async (req, res) => {
   try {
     const row = await db.get('SELECT MIN(DATETIME(Timestamp)) AS oldest from lastheard');
     res.json({ oldest: row.oldest });
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=record-oldest&url=record-oldest', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -99,6 +105,8 @@ router.get('/record-newest', async (req, res) => {
   try {
     const row = await db.get('SELECT MAX(DATETIME(Timestamp)) AS newest from lastheard');
     res.json({ newest: row.newest });
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=record-newest&url=record-newest&e_c=API&e_a=get&e_n=newest', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -108,6 +116,8 @@ router.get('/record-count-history', async (req, res) => {
   try {
     const row = await db.get('SELECT COUNT(*) AS count FROM lhhistory');
     res.json({ count: row.count });
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=record-count-history&url=%2Frecord-count-history', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -117,6 +127,8 @@ router.get('/record-oldest-history', async (req, res) => {
   try {
     const row = await db.get('SELECT MIN(DATETIME(Timestamp)) AS oldest from lhhistory');
     res.json({ oldest: row.oldest });
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=record-oldest-history&url=record-oldest-history&e_c=API&e_a=get&e_n=oldest-history', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -126,6 +138,8 @@ router.get('/record-newest-history', async (req, res) => {
   try {
     const row = await db.get('SELECT MAX(DATETIME(Timestamp)) AS newest from lhhistory');
     res.json({ newest: row.newest });
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=record-newest-history&url=record-newest-history&e_c=API&e_a=get&e_n=newest-history', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -142,6 +156,8 @@ router.get('/record-count-range-country', async (req, res) => {
   try {
     const row = await db.get(query);
     res.json({ count: row.count });
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=record-count-range-country&url=record-count-range-country&e_c=API&e_a=get&e_n=records-range-country', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -163,6 +179,8 @@ router.get('/top-destination-range-country', async (req, res) => {
   try {
     const rows = await db.all(query);
     res.json(rows);
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=top-range-country&url=top-destination-range-country&e_c=API&e_a=get&e_n=tg-range-country', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -183,6 +201,8 @@ router.get('/top-call-range-country', async (req, res) => {
   try {
     const rows = await db.all(query);
     res.json(rows);
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=top-call-range-country&url=top-call-range-country&e_c=API&e_a=get&e_n=call-range-country', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
