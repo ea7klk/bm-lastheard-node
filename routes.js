@@ -177,7 +177,7 @@ router.get('/top-destination-range-country', async (req, res) => {
   try {
     const rows = await db.all(query);
     res.json(rows);
-    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=top-range-country&url=%2Ftop-destination-range-country', resp => {
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=top-range-country&url=%2Ftop-destination-range-country&e_c=API&e_a=get&e_n=tg-range-country', resp => {
     })
   } catch (err) {
     res.status(500).json({ error: err.message });
