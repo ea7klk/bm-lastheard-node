@@ -72,6 +72,8 @@ router.get('/lastheard', async (req, res) => {
   try {
     const rows = await db.all('SELECT * FROM lastheard ORDER BY Timestamp DESC LIMIT 20');
     res.json(rows);
+    https.get('https://matomo.conxtor.com/matomo.php?idsite=1&rec=1&action_name=lastheard&lastheard&e_c=API&e_a=get&e_n=lastheard', resp => {
+    })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
