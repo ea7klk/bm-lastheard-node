@@ -36,6 +36,9 @@ The second option allows for saving the database to a volume to persist data bet
 
 The database will be created automatically if it's not present. 
 
+## Caveat Emptor! - ATTENTION
+The program, right now contains hard-coded Matomo calls for some usage tracking. Please disable those before running your own instance. 
+
 ## Contribute
 - Fork the repository
 - Create your own branch
