@@ -57,12 +57,6 @@ socket.on('mqtt', (data) => {
     return;
   }
 
-  // console log to debug 24001
-  if (lastheard.DestinationID === 214001) {
-    console.log(lastheard);
-  }
-
-
   // Step 8: Check if lastheard.stop is 0
   if (lastheard.Stop === 0) {
     return; // Do not print if stop is 0
